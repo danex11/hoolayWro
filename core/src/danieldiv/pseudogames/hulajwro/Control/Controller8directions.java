@@ -72,7 +72,7 @@ public class Controller8directions {
         // CCC  ---  constant Y
         else if (touchScreenPosGdx.y >= plrSpriteScreenPos.y
                 && touchScreenPosGdx.y <= plrSpriteScreenPos.y + (straightMargin)) {
-            Gdx.app.log("tag", "constant Y  ");
+            //Gdx.app.log("tag", "constant Y  ");
             touchScreenPosV2.y = (0);
             if ((touchScreenPosGdx.x < plrPosXWithCorretion)) {
                 touchScreenPosV2.x = -touchScreenPosGdx.x;
@@ -81,7 +81,8 @@ public class Controller8directions {
             }
         }
         //////////////////Vector2 plrBodyWorldPosV2 = new Vector2(plrBodyWorldPos.x, plrBodyWorldPos.y);
-        Gdx.app.log("tagGdx", "Vector2touchscreenpos " + touchScreenPosV2);
+        //todo
+        //todo >>>>>>>>>>>>>>Gdx.app.log("tagGdx", "Vector2touchscreenpos " + touchScreenPosV2);
         /*
         //todo this control has only 4 fixed directions if done right
         //todo: -draw proper direction vector OR -add dead zone for directions up,down,left,right

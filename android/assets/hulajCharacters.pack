@@ -1,0 +1,19 @@
+
+hulajCharacters.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+sprite_frames_blue
+  rotate: false
+  xy: 1, 1
+  size: 228, 54
+  orig: 228, 54
+  offset: 0, 0
+  index: -1
+jelen
+  rotate: false
+  xy: 231, 23
+  size: 195, 32
+  orig: 195, 32
+  offset: 0, 0
+  index: -1

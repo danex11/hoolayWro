@@ -7,14 +7,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import danieldiv.pseudogames.hulajwro.GamePlay;
-import danieldiv.pseudogames.hulajwro.Screens.PlayScreen;
+import danieldiv.pseudogames.hulajwro.SpielFahre;
 
 //New camera and new viewport to keep Hud locked at given position on the screen
-public class Hud {
+public class Hud implements Disposable {
     public Stage stage;
     private Viewport viewport;
 
@@ -35,7 +35,7 @@ public class Hud {
         score = 0;
 
         //fits to height, adds black bars to sides
-        viewport = new FitViewport(GamePlay.VIRTUAL_WIDTH, GamePlay.VIRTUAL_HEIGHT, new OrthographicCamera());
+        viewport = new FitViewport(SpielFahre.VIRTUAL_WIDTH, SpielFahre.VIRTUAL_HEIGHT, new OrthographicCamera());
         //stage is like a empty box waiting for Table to lay out Labels
         stage = new Stage(viewport, sb);
 
@@ -67,5 +67,10 @@ public class Hud {
 
 
         stage.addActor(table);
+    }
+
+    @Override
+    public void dispose() {
+        stage.dispose();
     }
 }
