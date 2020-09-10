@@ -35,12 +35,15 @@ public class PlrSprite extends Sprite {
         BodyDef bodydef = new BodyDef();
         bodydef.position.set(32 / PPM, 128 / PPM);
         bodydef.type = BodyDef.BodyType.DynamicBody;
+        //BODY in kgm   BODY in kgm BODY in kgm BODY in kgm
+        //we are writing in meters and kg
+        //if things are too big or too small we change the camera magnification
         //place body in world
         b2body = world.createBody(bodydef);
         //fixture def
         FixtureDef fdef = new FixtureDef();
         CircleShape circle = new CircleShape();
-        circle.setRadius(40 / PPM);
+        circle.setRadius((float) 0.7);
 
         fdef.shape = circle;
         b2body.createFixture(fdef);

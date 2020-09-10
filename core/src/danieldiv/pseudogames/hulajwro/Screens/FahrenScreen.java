@@ -49,10 +49,10 @@ public class FahrenScreen extends InputAdapter implements Screen {
     private PlrSprite plr;
 
     private boolean goGoGo;
-    float dragX,dragY;
+    float dragX, dragY;
     Vector3 touchScreenPosGdx = new Vector3(0, 0, 0);
     //https://github.com/libgdx/libgdx/wiki/Event-handling#inputmultiplexer
-    InputAdapter inputHandling= new InputAdapter() {
+    InputAdapter inputHandling = new InputAdapter() {
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
             goGoGo = true;
@@ -63,6 +63,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
             Gdx.app.log("tagGdxT", "touchDown_WorldPos " + touchScreenPosGdx);
             return false;
         }
+
         @Override
         public boolean touchDragged(int screenX, int screenY, int pointer) {
             goGoGo = true;
@@ -73,6 +74,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
             Gdx.app.log("tagGdxT", "touchDrag_WorldPos " + touchScreenPosGdx);
             return false;
         }
+
         @Override
         public boolean touchUp(int x, int y, int pointer, int button) {
             // your touch up code here
@@ -125,28 +127,80 @@ public class FahrenScreen extends InputAdapter implements Screen {
     }
 
 
+    int dirX, dirY;
+    int speed, damping;
+
     public void handleInput(float deltatime) {
+        //zoom
+        if (Gdx.input.isKeyPressed(Input.Keys.Z) && spielcam.zoom > 0)
+            spielcam.zoom -= 0.01f;
+        if (Gdx.input.isKeyPressed(Input.Keys.X))
+            spielcam.zoom += 0.01f;
+
+
+        dirX = 0;
+        dirY = 0;
+        speed = 20;
+        damping = 9;
+        float damping_thresh = (float) 0.01;
+
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) dirY = -1;
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) dirY = 1;
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) dirX = -1;
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) dirX = 1;
+
+        if (plr.b2body.getLinearVelocity().x > damping_thresh)
+            plr.b2body.applyLinearImpulse(new Vector2(-damping / PPM, 0), new Vector2(0, 0), true);
+        if (plr.b2body.getLinearVelocity().x < -damping_thresh)
+            plr.b2body.applyLinearImpulse(new Vector2(damping / PPM, 0), new Vector2(0, 0), true);
+        if (plr.b2body.getLinearVelocity().y > damping_thresh)
+            plr.b2body.applyLinearImpulse(new Vector2(0, -damping / PPM), new Vector2(0, 0), true);
+        if (plr.b2body.getLinearVelocity().y < -damping_thresh)
+            plr.b2body.applyLinearImpulse(new Vector2(0, damping / PPM), new Vector2(0, 0), true);
+        /*
+        if ((plr.b2body.getLinearVelocity().x < damping_thresh) && (plr.b2body.getLinearVelocity().x > -damping_thresh) && !goGoGo)
+            plr.b2body.setLinearVelocity(new Vector2(0, 0));
+        if ((plr.b2body.getLinearVelocity().y < damping_thresh) && (plr.b2body.getLinearVelocity().y > -damping_thresh)&& !goGoGo)
+            plr.b2body.setLinearVelocity(new Vector2(0, 0));
+         */
+
+        //plr.b2body.setLinearVelocity(dirX * speed, dirY * speed);
+        plr.b2body.applyLinearImpulse(new Vector2((dirX * speed) / PPM, (dirY * speed) / PPM), new Vector2(0, 0), true);
+
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE))
+            plr.b2body.setLinearVelocity(new Vector2(0, 0));
+        ;
+
+        // pos.x =  plr.b2body.getPosition().x - width / 2;
+        // pos.y =  plr.b2body.getPosition().y - height / 4;
+
+
+        //0.4f means 0.4frames
+        /*
         if (Gdx.input.isKeyJustPressed(Input.Keys.W))
             plr.b2body.applyLinearImpulse(new Vector2(0, 4f), plr.b2body.getWorldCenter(), true);
         if (Gdx.input.isKeyPressed(Input.Keys.D) && plr.b2body.getLinearVelocity().x <= 2)
             plr.b2body.applyLinearImpulse(new Vector2(0.4f, 0), plr.b2body.getWorldCenter(), true);
         if (Gdx.input.isKeyPressed(Input.Keys.A) && plr.b2body.getLinearVelocity().x >= -2)
             plr.b2body.applyLinearImpulse(new Vector2(-0.4f, 0), plr.b2body.getWorldCenter(), true);
-
+         */
 
         //Controller8directions();
+
+        //todo it seems to be just 4 directional
+        //todo create methods for all controls for futore projects
+        Vector2 moveVectScaled = new Vector2(0, 0);
         if (goGoGo) {
-        int hpx = Gdx.graphics.getHeight();
-        Vector2 plrBodyScreenPosV2 = new Vector2(plr.b2body.getPosition().x, plr.b2body.getPosition().y);
+            int hpx = Gdx.graphics.getHeight();
+            Vector2 plrBodyScreenPosV2 = new Vector2(plr.b2body.getPosition().x, plr.b2body.getPosition().y);
+            // Gdx.app.log("tagGdx", "FahrenScreen_touchScreenPosGdx " + touchScreenPosGdx);
+            Vector2 moveVect = Controller8directions.moveVector(hpx, spielcam, touchScreenPosGdx, plrBodyScreenPosV2, plr);
+            moveVectScaled = new Vector2(moveVect.x / (PPM*10), moveVect.y / (PPM *10));
+            plr.b2body.applyLinearImpulse(moveVectScaled, plr.b2body.getWorldCenter(), true);
+        } else if (!goGoGo) {
+//https://carelesslabs.wordpress.com/2017/08/05/making-a-libgdx-roguelike-survival-game-part-6-box2d-collisions-gamedev/
 
-
-       // Gdx.app.log("tagGdx", "FahrenScreen_touchScreenPosGdx " + touchScreenPosGdx);
-        Vector2 moveVect = Controller8directions.moveVector(hpx, spielcam, touchScreenPosGdx, plrBodyScreenPosV2, plr);
-         Vector2 moveVectScaled = new Vector2(moveVect.x/PPM, moveVect.y/PPM);
-        plr.b2body.applyLinearImpulse(moveVectScaled, plr.b2body.getWorldCenter(), true);
-        }
-        //else if (!goGoGo) {
-            /*
+/*
             //todo if velocity !=0 apply counterforce
             Vector2 velocityPlr = new Vector2(plrBody.getLinearVelocity());
             if (velocityPlr.x > 0) {
@@ -157,8 +211,10 @@ public class FahrenScreen extends InputAdapter implements Screen {
             this.plrBody.applyLinearImpulse(movementVector, plrBodyScreenPosV2, true);
             //movementVector = new Vector2(-movementVector.x / 2, -movementVector.y / 2);
         }
-             */
-        // }
+
+
+ */
+        }
 
 
     }
@@ -191,7 +247,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         mapRenderer.setView(spielcam);
-        //mapRenderer.render();
+        mapRenderer.render();
         //b2d render
         b2drenderer.render(world, spielcam.combined);
 
