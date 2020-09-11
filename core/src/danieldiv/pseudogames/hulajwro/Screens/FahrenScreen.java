@@ -24,6 +24,8 @@ import danieldiv.pseudogames.hulajwro.Scenes.Hud;
 import danieldiv.pseudogames.hulajwro.Tools.B2WorldBuilder;
 import danieldiv.pseudogames.hulajwro.sprites.PlrSprite;
 
+import static java.lang.Float.compare;
+
 public class FahrenScreen extends InputAdapter implements Screen {
 
     //reference to our game, used to set Screens
@@ -138,82 +140,74 @@ public class FahrenScreen extends InputAdapter implements Screen {
             spielcam.zoom += 0.01f;
 
 
-        dirX = 0;
-        dirY = 0;
-        speed = 20;
-        damping = 9;
-        float damping_thresh = (float) 0.01;
-
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) dirY = -1;
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) dirY = 1;
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) dirX = -1;
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) dirX = 1;
-
-        if (plr.b2body.getLinearVelocity().x > damping_thresh)
-            plr.b2body.applyLinearImpulse(new Vector2(-damping / PPM, 0), new Vector2(0, 0), true);
-        if (plr.b2body.getLinearVelocity().x < -damping_thresh)
-            plr.b2body.applyLinearImpulse(new Vector2(damping / PPM, 0), new Vector2(0, 0), true);
-        if (plr.b2body.getLinearVelocity().y > damping_thresh)
-            plr.b2body.applyLinearImpulse(new Vector2(0, -damping / PPM), new Vector2(0, 0), true);
-        if (plr.b2body.getLinearVelocity().y < -damping_thresh)
-            plr.b2body.applyLinearImpulse(new Vector2(0, damping / PPM), new Vector2(0, 0), true);
-        /*
-        if ((plr.b2body.getLinearVelocity().x < damping_thresh) && (plr.b2body.getLinearVelocity().x > -damping_thresh) && !goGoGo)
-            plr.b2body.setLinearVelocity(new Vector2(0, 0));
-        if ((plr.b2body.getLinearVelocity().y < damping_thresh) && (plr.b2body.getLinearVelocity().y > -damping_thresh)&& !goGoGo)
-            plr.b2body.setLinearVelocity(new Vector2(0, 0));
-         */
-
-        //plr.b2body.setLinearVelocity(dirX * speed, dirY * speed);
-        plr.b2body.applyLinearImpulse(new Vector2((dirX * speed) / PPM, (dirY * speed) / PPM), new Vector2(0, 0), true);
-
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE))
             plr.b2body.setLinearVelocity(new Vector2(0, 0));
-        ;
 
-        // pos.x =  plr.b2body.getPosition().x - width / 2;
-        // pos.y =  plr.b2body.getPosition().y - height / 4;
+        dirX = 0;
+        dirY = 0;
+        speed = 15;
+        damping = 9;
+        float damping_thresh = (float) 0.001;
+        float damping_thresh_minus = -damping_thresh;
+        float linVelX = plr.b2body.getLinearVelocity().x;
+        float linVelY = plr.b2body.getLinearVelocity().y;
 
 
-        //0.4f means 0.4frames
-        /*
-        if (Gdx.input.isKeyJustPressed(Input.Keys.W))
-            plr.b2body.applyLinearImpulse(new Vector2(0, 4f), plr.b2body.getWorldCenter(), true);
-        if (Gdx.input.isKeyPressed(Input.Keys.D) && plr.b2body.getLinearVelocity().x <= 2)
-            plr.b2body.applyLinearImpulse(new Vector2(0.4f, 0), plr.b2body.getWorldCenter(), true);
-        if (Gdx.input.isKeyPressed(Input.Keys.A) && plr.b2body.getLinearVelocity().x >= -2)
-            plr.b2body.applyLinearImpulse(new Vector2(-0.4f, 0), plr.b2body.getWorldCenter(), true);
-         */
-
-        //Controller8directions();
-
-        //todo it seems to be just 4 directional
-        //todo create methods for all controls for futore projects
+        float moveVectX = 0;
+        float moveVectY = 0;
         Vector2 moveVectScaled = new Vector2(0, 0);
+        //Gdx.app.log("tagGdx", "linearVelX " + linVelX);
+       // Gdx.app.log("tagGdx", "linearVelY " + linVelY);
+
+        //todo
+        //na sztywno zatrzymaj w y
+        //if touchpos == pos.y {linvely =0
         if (goGoGo) {
             int hpx = Gdx.graphics.getHeight();
             Vector2 plrBodyScreenPosV2 = new Vector2(plr.b2body.getPosition().x, plr.b2body.getPosition().y);
-            // Gdx.app.log("tagGdx", "FahrenScreen_touchScreenPosGdx " + touchScreenPosGdx);
             Vector2 moveVect = Controller8directions.moveVector(hpx, spielcam, touchScreenPosGdx, plrBodyScreenPosV2, plr);
-            moveVectScaled = new Vector2(moveVect.x / (PPM*10), moveVect.y / (PPM *10));
+            Gdx.app.log("tagGdx", "moveVect " + moveVect);
+            //limiting max x and y velocity
+            if (linVelX > 10) moveVectX = 0;
+            else moveVectX = moveVect.x;
+            if (linVelY > 4) {
+                moveVectY = 0;
+               // plr.b2body.applyLinearImpulse(new Vector2(0, -moveVectY), plr.b2body.getWorldCenter(), true);
+            }
+            else moveVectY = moveVect.y;
+            //zeroing y velocity
+            Vector2 pos = new Vector2(plr.b2body.getPosition());
+            float posY = plr.b2body.getPosition().y;
+            Gdx.app.log("tagGdx", "posY " +posY);
+            Gdx.app.log("tagGdx", "dragY/PPM-one " + (dragY/PPM - 1));
+            //todo this should not be dependant of touching ofr not the screen
+            if (posY > (2*dragY/PPM) - 0.3 && posY < (2*dragY/PPM) + 0.3) {            Gdx.app.log("tagGdx", "inYzeroVelRange ");
+                plr.b2body.setLinearVelocity(plr.b2body.getLinearVelocity().x, 0);
+            moveVectY = 0;}
+            //applying impulses
+            //todo fix vector values - it takes them from 0,0 origin and is slower in some directions
+            moveVectScaled = new Vector2(moveVectX / (PPM * 100), moveVectY / (PPM * 5));
+            Gdx.app.log("tagGdx", "moveVectScaled " + moveVectScaled);
             plr.b2body.applyLinearImpulse(moveVectScaled, plr.b2body.getWorldCenter(), true);
         } else if (!goGoGo) {
-//https://carelesslabs.wordpress.com/2017/08/05/making-a-libgdx-roguelike-survival-game-part-6-box2d-collisions-gamedev/
-
-/*
-            //todo if velocity !=0 apply counterforce
-            Vector2 velocityPlr = new Vector2(plrBody.getLinearVelocity());
-            if (velocityPlr.x > 0) {
-                movementVector = new Vector2(-movementVector.x, -movementVector.y);
-            } else {
-                movementVector = new Vector2(0, 0);
+            if (linVelX > damping_thresh) {
+                plr.b2body.applyLinearImpulse(new Vector2(-damping / PPM, 0), new Vector2(0, 0), true);
             }
-            this.plrBody.applyLinearImpulse(movementVector, plrBodyScreenPosV2, true);
-            //movementVector = new Vector2(-movementVector.x / 2, -movementVector.y / 2);
-        }
+            if (linVelX < damping_thresh_minus) {
+                plr.b2body.applyLinearImpulse(new Vector2(damping / PPM, 0), new Vector2(0, 0), true);
+            }
+            if (linVelY > damping_thresh) {
+                plr.b2body.applyLinearImpulse(new Vector2(0, -damping / PPM), new Vector2(0, 0), true);
+            }
+            if (linVelY < damping_thresh_minus) {
+                plr.b2body.applyLinearImpulse(new Vector2(0, damping / PPM), new Vector2(0, 0), true);
+            }
 
+            if ((linVelX < damping_thresh * 10) && (linVelX > -damping_thresh * 10))
+                plr.b2body.setLinearVelocity(new Vector2(0, 0));
+            if ((linVelY < damping_thresh * 10) && (linVelY > -damping_thresh * 10))
+                plr.b2body.setLinearVelocity(new Vector2(0, 0));
 
- */
         }
 
 
