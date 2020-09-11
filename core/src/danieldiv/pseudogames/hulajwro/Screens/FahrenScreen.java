@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import danieldiv.pseudogames.hulajwro.Control.Controller8directions;
+import danieldiv.pseudogames.hulajwro.Control.Controller8directionsConstVect;
 import danieldiv.pseudogames.hulajwro.Control.InputsHandling;
 import danieldiv.pseudogames.hulajwro.SpielFahre;
 import danieldiv.pseudogames.hulajwro.Scenes.Hud;
@@ -110,7 +111,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
 
         // mapRenderer.setView(spielViewPort);
         //move zerozero to left down corner
-        spielcam.position.set(spielViewPort.getWorldWidth() / 2, spielViewPort.getWorldHeight() / 2, 0);
+        spielcam.position.set((spielViewPort.getWorldWidth() / 2), spielViewPort.getWorldHeight() / 2, 0);
         world = new World(new Vector2(0, 0), true);
         b2drenderer = new Box2DDebugRenderer();
 
@@ -157,7 +158,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
         float moveVectY = 0;
         Vector2 moveVectScaled = new Vector2(0, 0);
         //Gdx.app.log("tagGdx", "linearVelX " + linVelX);
-       // Gdx.app.log("tagGdx", "linearVelY " + linVelY);
+        // Gdx.app.log("tagGdx", "linearVelY " + linVelY);
 
         //todo
         //na sztywno zatrzymaj w y
@@ -165,25 +166,27 @@ public class FahrenScreen extends InputAdapter implements Screen {
         if (goGoGo) {
             int hpx = Gdx.graphics.getHeight();
             Vector2 plrBodyScreenPosV2 = new Vector2(plr.b2body.getPosition().x, plr.b2body.getPosition().y);
-            Vector2 moveVect = Controller8directions.moveVector(hpx, spielcam, touchScreenPosGdx, plrBodyScreenPosV2, plr);
+            Vector2 moveVect = Controller8directionsConstVect.moveVector(hpx, spielcam, touchScreenPosGdx, plrBodyScreenPosV2, plr);
             Gdx.app.log("tagGdx", "moveVect " + moveVect);
             //limiting max x and y velocity
-            if (linVelX > 10) moveVectX = 0;
+            if (linVelX > 20) moveVectX = 0;
             else moveVectX = moveVect.x;
-            if (linVelY > 4) {
+            if (linVelY > 10 || linVelY < -10) {
                 moveVectY = 0;
-               // plr.b2body.applyLinearImpulse(new Vector2(0, -moveVectY), plr.b2body.getWorldCenter(), true);
-            }
-            else moveVectY = moveVect.y;
+                // plr.b2body.applyLinearImpulse(new Vector2(0, -moveVectY), plr.b2body.getWorldCenter(), true);
+            } else moveVectY = moveVect.y;
             //zeroing y velocity
             Vector2 pos = new Vector2(plr.b2body.getPosition());
             float posY = plr.b2body.getPosition().y;
-            Gdx.app.log("tagGdx", "posY " +posY);
-            Gdx.app.log("tagGdx", "dragY/PPM-one " + (dragY/PPM - 1));
+            Gdx.app.log("tagGdx", "posY " + posY);
+            Gdx.app.log("tagGdx", "dragY/PPM-one " + (dragY / PPM - 1));
             //todo this should not be dependant of touching ofr not the screen
-            if (posY > (2*dragY/PPM) - 0.3 && posY < (2*dragY/PPM) + 0.3) {            Gdx.app.log("tagGdx", "inYzeroVelRange ");
+            //or maybe we want to allow the plr to make sprite float after  touchUp??
+            if (posY > (2 * dragY / PPM) - 0.3 && posY < (2 * dragY / PPM) + 0.3) {
+                Gdx.app.log("tagGdx", "inYzeroVelRange ");
                 plr.b2body.setLinearVelocity(plr.b2body.getLinearVelocity().x, 0);
-            moveVectY = 0;}
+                moveVectY = 0;
+            }
             //applying impulses
             //todo fix vector values - it takes them from 0,0 origin and is slower in some directions
             moveVectScaled = new Vector2(moveVectX / (PPM * 100), moveVectY / (PPM * 5));
@@ -222,7 +225,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
         plr.updatee(deltatime);
 
         //cam tracking
-        spielcam.position.x = plr.b2body.getPosition().x;
+        spielcam.position.x = plr.b2body.getPosition().x + spielViewPort.getWorldWidth() / 5;
 
         spielcam.update();
 
