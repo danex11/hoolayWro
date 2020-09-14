@@ -14,7 +14,7 @@ public class Controller8directionsConstVect {
     Vector2 touchScreenPosV2;
 
 
-    public static Vector2 moveVector(int h, Camera camera, Vector3 touchScreenPosGdx, Vector2 plrBodyScreenPosV2, Sprite plrSprite) {
+    public static Vector2 moveVector(int h, Camera camera, Vector3 touchScreenPosGdx, Vector3 plrBodyScreenPosV3, Sprite plrSprite) {
         //  plrBody.applyForce(100000f, 100f, screenX, screenY, true);
         // plrBody.applyTorque(400000f, true);
         //force in pixels/s
@@ -36,27 +36,27 @@ public class Controller8directionsConstVect {
         //////////////Vector3 plrBodyWorldPos = new Vector3(plrSprite.getX(), plrSprite.getY(), 0);
         //////////////Vector3 plrBodyWorldPos = new Vector3(plrSprite.getX(), plrSprite.getY(), 0);
         //project body coordinates in the world to coordinates on the screen
-        Vector3 plrSpriteWorldPosTemp = new Vector3(plrSprite.getX(), plrSprite.getY(), 0);
+        Vector3 plrSpriteWorldPos = new Vector3(plrSprite.getX(), plrSprite.getY(), 0);
         //////////////////Vector3 plrBodyWorldPosTemp = new Vector3(plrSprite.getX(), plrSprite.getY(), 0);
-        Vector3 plrSpriteScreenPos = new Vector3(camera.project(plrSpriteWorldPosTemp));
+        //Vector3 plrSpriteScreenPos = new Vector3(camera.project(plrSpriteWorldPosTemp));
         /////////////////Vector3 plrBodyScreenPos = new Vector3(camera.project(plrBodyWorldPosTemp));
         // Gdx.app.log("tag", "touchScreenPos=plrBodyScreenPos.y  " + touchScreenPos.y + "=" + plrBodyScreenPos.y);
 
         int widthCorrectiion = (int) (plrSprite.getWidth() / 2);
-        int plrPosXWithCorretion = (int) (plrSpriteScreenPos.x + widthCorrectiion);
+        int plrPosXWithCorretion = (int) (plrSprite.getX());// + widthCorrectiion);
         int straightMargin = (int) (1 * (plrSprite.getHeight()));// + 30;
-        Gdx.app.log("tagGdx", "plrSprite.getHeight() " + plrSprite.getHeight() );
-        Gdx.app.log("tagGdx", "plrSprite.getHeight() " + plrSprite.getHeight() );
+        Gdx.app.log("tagGdx", "plrSprite.getX() " + plrSprite.getX() );
+        Gdx.app.log("tagGdx", "plrSprite.getY() " + plrSprite.getY() );
         ///////////////////plrBodyScreenPosV2 = new Vector2(plrSpriteScreenPos.x, plrSpriteScreenPos.y);
         Vector2 touchzoneForceVector = new Vector2(0, 0);
 
-        int forceValueX = 200;
+        int forceValueX = 400;
         int forceValueY = 500;
 
 
 
         // CCC  ---  down Y
-        if ((touchScreenPosGdx.y < plrSpriteScreenPos.y)) {
+        if ((touchScreenPosGdx.y < plrSpriteWorldPos.y)) {
             ////////////////////////////Gdx.app.log("tag", "down Y  ");
             touchzoneForceVector.y = -((h - forceValueY));
             touchzoneForceVector.y = - forceValueY;
@@ -66,7 +66,7 @@ public class Controller8directionsConstVect {
                 touchzoneForceVector.x = forceValueX;
             }
             // CCC  ---  up Y
-        } else if (touchScreenPosGdx.y > plrSpriteScreenPos.y + (straightMargin)) {
+        } else if (touchScreenPosGdx.y > plrSpriteWorldPos.y + (straightMargin)) {
             /////////////////////////Gdx.app.log("tag", "up Y  ");
             touchzoneForceVector.y = (forceValueY);
             if ((touchScreenPosGdx.x < plrPosXWithCorretion)) {
@@ -76,8 +76,8 @@ public class Controller8directionsConstVect {
             }
         }
         // CCC  ---  constant Y
-        else if (touchScreenPosGdx.y >= plrSpriteScreenPos.y
-                && touchScreenPosGdx.y <= plrSpriteScreenPos.y + (straightMargin)) {
+        else if (touchScreenPosGdx.y >= plrSpriteWorldPos.y
+                && touchScreenPosGdx.y <= plrSpriteWorldPos.y + (straightMargin)) {
             //Gdx.app.log("tag", "constant Y  ");
             touchzoneForceVector.y = (0);
             if ((touchScreenPosGdx.x < plrPosXWithCorretion)) {

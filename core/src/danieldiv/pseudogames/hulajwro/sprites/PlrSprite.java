@@ -2,10 +2,13 @@ package danieldiv.pseudogames.hulajwro.sprites;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import java.awt.SplashScreen;
@@ -18,6 +21,8 @@ public class PlrSprite extends Sprite {
     public World world;
     public Body b2body;
     private TextureRegion plrStandstill;
+    //private Rectangle rectFeet;
+    private Rectangle rectFeet = new Rectangle();
 
     public PlrSprite(World world, FahrenScreen screen) {
         super(screen.getAtlas().findRegion("jelen"));
@@ -42,15 +47,26 @@ public class PlrSprite extends Sprite {
         b2body = world.createBody(bodydef);
         //fixture def
         FixtureDef fdef = new FixtureDef();
+        //circle shape?
+        fdef.restitution = 0.8f;
+        fdef.density = 0.8f;
         CircleShape circle = new CircleShape();
         circle.setRadius((float) 0.7);
+        //rectangle shape for legs area?
 
-        fdef.shape = circle;
+        rectFeet.setWidth((float) 0.7);
+        rectFeet.setHeight((float) 0.1);
+        PolygonShape plrShape = new PolygonShape();
+        plrShape.setAsBox(rectFeet.getWidth(), rectFeet.getHeight());
+
+        fdef.shape = plrShape;
         b2body.createFixture(fdef);
 
     }
 
     public void updatee(float dt) {
-        setPosition(b2body.getPosition().x - getWidth() / 2, b2body.getPosition().y - getHeight() / 2);
+      //  rectFeet.setWidth((float) 0.7);
+       // rectFeet.setHeight((float) 0.1);
+        setPosition(b2body.getPosition().x - getWidth() / 2, b2body.getPosition().y - rectFeet.getHeight() );
     }
 }
