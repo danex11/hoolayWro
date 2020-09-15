@@ -62,7 +62,7 @@ public class B2WorldBuilder {
         Body bodyEdgeTop;
 
         EdgeShape edgeShape = new EdgeShape();
-        edgeShape.set(0, 0, 10 * wpx, 0);
+        edgeShape.set(0, 0, 100 * wpx, 0);
 
 
         //--TOP Edge

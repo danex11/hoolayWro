@@ -44,13 +44,13 @@ public class Controller8directionsConstVect {
 
         int widthCorrectiion = (int) (plrSprite.getWidth() / 2);
         int plrPosXWithCorretion = (int) (plrSprite.getX());// + widthCorrectiion);
-        int straightMargin = (int) (1 * (plrSprite.getHeight()));// + 30;
+        int straightMargin = (int) (1.3 * (plrSprite.getWidth()));// + 30;
         Gdx.app.log("tagGdx", "plrSprite.getX() " + plrSprite.getX() );
         Gdx.app.log("tagGdx", "plrSprite.getY() " + plrSprite.getY() );
         ///////////////////plrBodyScreenPosV2 = new Vector2(plrSpriteScreenPos.x, plrSpriteScreenPos.y);
         Vector2 touchzoneForceVector = new Vector2(0, 0);
 
-        int forceValueX = 400;
+        int forceValueX = 300;
         int forceValueY = 500;
 
 
