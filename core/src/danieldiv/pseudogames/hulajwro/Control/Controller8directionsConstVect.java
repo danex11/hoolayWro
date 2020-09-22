@@ -31,7 +31,6 @@ public class Controller8directionsConstVect {
 //https://badlogicgames.com/forum/viewtopic.php?f=11&t=20536
 
 
-        //todo get either sprite or body position
         //Vector2 plrBody = this.plrBody.getPosition();
         //////////////Vector3 plrBodyWorldPos = new Vector3(plrSprite.getX(), plrSprite.getY(), 0);
         //////////////Vector3 plrBodyWorldPos = new Vector3(plrSprite.getX(), plrSprite.getY(), 0);

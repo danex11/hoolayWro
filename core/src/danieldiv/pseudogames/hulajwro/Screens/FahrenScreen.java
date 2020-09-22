@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -35,11 +36,20 @@ import danieldiv.pseudogames.hulajwro.Scenes.Hud;
 import danieldiv.pseudogames.hulajwro.Tools.B2WorldBuilder;
 import danieldiv.pseudogames.hulajwro.sprites.PlrSprite;
 
+
+//TODO texture bleeding
+//TODO deadzone to go straight up or down
+//todo marker @isFinished to stop controls handling, stop timer and display its finishing value
+
 public class FahrenScreen extends InputAdapter implements Screen {
 
     //reference to our game, used to set Screens
     private SpielFahre spiel;
     private TextureAtlas atlas;
+
+    //Prefs
+    Preferences prefs = Gdx.app.getPreferences("game preferences");
+
 
     //basic playscreen variables
     private OrthographicCamera spielcam;
@@ -72,8 +82,8 @@ public class FahrenScreen extends InputAdapter implements Screen {
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
             goGoGo = true;
             touchX = Gdx.input.getX();
-            //todo this dragY comes from screen height in pixels and makes no sense for desktom height is 720, for mobile 1020 or another
-            //todo work on world coords exclusively
+            // this dragY comes from screen height in pixels and makes no sense for desktom height is 720, for mobile 1020 or another
+            // work on world coords exclusively
             //unproject to world coords before any calculations
             touchY = Gdx.input.getY();
             //makes touchpos independant of screen density or resolution
@@ -121,7 +131,6 @@ public class FahrenScreen extends InputAdapter implements Screen {
         atlas = new TextureAtlas("hulajCharacters.pack");
 
 
-
         spielcam = new OrthographicCamera();
         //scale View to height, than add black bars at sides to meintain aspect ratio
         spielViewPort = new FitViewport(SpielFahre.VIRTUAL_WIDTH / PPM, SpielFahre.VIRTUAL_HEIGHT / PPM, spielcam);
@@ -130,6 +139,16 @@ public class FahrenScreen extends InputAdapter implements Screen {
         // mapViewPort = new ScreenViewport(gamecam);
         //this game.batch gets variable batch from GamePlay
         hud = new Hud(spiel.batch, this, spiel);
+
+
+        //Prefs
+        Float object = new Float((prefs.getFloat("highscore")));
+        if (object != null) {
+            hud.setRecordTime(prefs.getFloat("highscore"));
+        }
+        //for Debugging
+        //prefs.putFloat("highscore", 999);
+        //hud.setRecordTime(999);
 
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("tilemaps/csvprawydol.tmx");
@@ -173,9 +192,6 @@ public class FahrenScreen extends InputAdapter implements Screen {
         Gdx.input.setInputProcessor(multiplexer);
 
 
-
-
-
     }
 
 
@@ -208,14 +224,15 @@ public class FahrenScreen extends InputAdapter implements Screen {
                 //return super.touchDown(event, x, y, pointer, button);
                 Gdx.app.log("TagGdx", "reset up");
                 isResetPressed = true;
+                //Prefs - highscore load
+                hud.setRecordTime(prefs.getFloat("highscore"));
                 return true;
             }
 
 
-
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-               // super.touchUp(event, x, y, pointer, button);
+                // super.touchUp(event, x, y, pointer, button);
                 isResetPressed = false;
                 Gdx.app.log("TagGdx", "reset false");
             }
@@ -251,14 +268,13 @@ public class FahrenScreen extends InputAdapter implements Screen {
         //Gdx.app.log("tagGdx", "linearVelX " + linVelX);
         // Gdx.app.log("tagGdx", "linearVelY " + linVelY);
 
-        //todo
         //na sztywno zatrzymaj w y
         //if touchpos == pos.y {linvely =0
         if (goGoGo) {
             int hpx = Gdx.graphics.getHeight();
             Vector2 plrBodyScreenPosV2 = new Vector2(plr.b2body.getPosition().x, plr.b2body.getPosition().y);
 
-            //todo feed world POS to moveVect
+            // feed world POS to moveVect
             //spielcam.unproject(touchScreenPosGdx);
             Vector3 plrBodyScreenPosV3 = new Vector3(plrBodyScreenPosV2.x, plrBodyScreenPosV2.y, 0);
             spielcam.unproject(plrBodyScreenPosV3);
@@ -275,7 +291,6 @@ public class FahrenScreen extends InputAdapter implements Screen {
             //zeroing y velocity
             Vector2 pos = new Vector2(plr.b2body.getPosition());
             float posY = plr.b2body.getPosition().y;
-            //todo this does not work properly on android
             Gdx.app.log("tagGdx", "posY " + posY);
             //float dragYnew = dragY / PPM;
             Gdx.app.log("tagGdx", "touchScreenUnprojWorld.y " + (touchScreenPosGdx.y));
@@ -315,6 +330,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
 
 
     public void update(float deltatime) {
+
         handleInput(deltatime);
 
         world.step(1 / 60f, 6, 2);
@@ -327,16 +343,45 @@ public class FahrenScreen extends InputAdapter implements Screen {
         spielcam.position.x = plr.b2body.getPosition().x + spielViewPort.getWorldWidth() / 3;
 
         spielcam.update();
-
-
+        hud.update(deltatime);
+        isFinished(250);
     }
+
+    float thisscore = 0;
+
+    public void isFinished(int finishpoint) {
+        if (plr.getX() > finishpoint && plr.getX() < finishpoint + 1) {
+            Gdx.app.log("APPlog", "plr.getX() " + plr.getX());
+            thisscore = hud.getRunTimer();
+            Gdx.app.log("APPlog", "thisscore " + thisscore);
+            Gdx.app.log("APPlog", "hud.getRecordTime() " + hud.getRecordTime());
+            Gdx.app.log("APPlog", "prefs.getFloat() " + (new Float(prefs.getFloat("highscore"))));
+            if (thisscore < prefs.getFloat("highscore") || (new Float(prefs.getFloat("highscore"))) == 0.0) {
+                hud.setRecordTime(thisscore);
+                //Prefs highscore save
+                prefs.putFloat("highscore", thisscore);
+                prefs.flush();
+            }
+        }
+    }
+
+    public enum State {Running, Paused}
+
+    //set to run
+    State state = State.Running;
 
 
     @Override
     public void render(float delta) {
         //this @delta is than casted into @deltatime
         //delta – The time in seconds since the last render.
-        update(delta);
+        switch (state) {
+            case Running:
+                update(delta);
+                break;
+            case Paused:
+                break;
+        }
 
         //background -- clearing is neccessary
         Gdx.gl.glClearColor((float) 0.2, 0, 0, 1);
@@ -348,7 +393,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
         mapRenderer.setView(spielcam);
         mapRenderer.render();
         //b2d render
-       //XXXXXXXXXXXX b2drenderer.render(world, spielcam.combined);
+        //XXXXXXXXXXXX b2drenderer.render(world, spielcam.combined);
 
         //BATCH     BATCH   BATCH   BATCH
         //to only render what is visible
@@ -357,11 +402,10 @@ public class FahrenScreen extends InputAdapter implements Screen {
         plr.draw(spiel.batch);
         spiel.batch.end();
 
+        //render overlays
         mapRenderer.getBatch().begin();
         mapRenderer.renderTileLayer(overlayLayer);
         mapRenderer.getBatch().end();
-
-        //todo add overlaps
 
 
         spiel.batch.setProjectionMatrix(hud.stage.getCamera().combined);
@@ -377,10 +421,12 @@ public class FahrenScreen extends InputAdapter implements Screen {
 
     @Override
     public void pause() {
+        this.state = State.Paused;
     }
 
     @Override
     public void resume() {
+        this.state = State.Running;
     }
 
     @Override
