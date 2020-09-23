@@ -34,6 +34,7 @@ import danieldiv.pseudogames.hulajwro.Control.Controller8directionsConstVect;
 import danieldiv.pseudogames.hulajwro.SpielFahre;
 import danieldiv.pseudogames.hulajwro.Scenes.Hud;
 import danieldiv.pseudogames.hulajwro.Tools.B2WorldBuilder;
+import danieldiv.pseudogames.hulajwro.Tools.FixBleedingTiles;
 import danieldiv.pseudogames.hulajwro.sprites.PlrSprite;
 
 
@@ -59,7 +60,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
     private Hud hud;
     //Map
     private TmxMapLoader mapLoader;
-    private TiledMap map;
+    private TiledMap map, mapFixed;
     private OrthogonalTiledMapRenderer mapRenderer;
     private MapLayers mapLayers;
     private TiledMapTileLayer overlayLayer;
@@ -150,12 +151,21 @@ public class FahrenScreen extends InputAdapter implements Screen {
         //prefs.putFloat("highscore", 999);
         //hud.setRecordTime(999);
 
+
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("tilemaps/csvprawydol.tmx");
+
+        //map texture bleeding fix
+        FixBleedingTiles fixedmap = new FixBleedingTiles(map);
+        mapFixed = new FixBleedingTiles(map).fixTilesPixelBleeding(map);
+
         //this centers around zero,zero
-        mapRenderer = new OrthogonalTiledMapRenderer(map, 1 / PPM);
-// Reading map layers
+        //mapRenderer = new OrthogonalTiledMapRenderer(map, 1 / PPM);
+        mapRenderer = new OrthogonalTiledMapRenderer(mapFixed, 1 / PPM);
+        // Reading map layers
         mapLayers = map.getLayers();
+
+        //map overlay layer
         overlayLayer = (TiledMapTileLayer) mapLayers.get("overlay");
 
         // mapRenderer.setView(spielViewPort);
@@ -198,6 +208,30 @@ public class FahrenScreen extends InputAdapter implements Screen {
     public TextureAtlas getAtlas() {
         return atlas;
     }
+
+    public static void fixBleeding(TextureRegion[][] region) {
+        for (TextureRegion[] array : region) {
+            for (TextureRegion texture : array) {
+                fixBleeding(texture);
+            }
+        }
+    }
+
+    public static void fixBleeding(TextureRegion region) {
+        float fix = 0.01f;
+
+        float x = region.getRegionX();
+        float y = region.getRegionY();
+        float width = region.getRegionWidth();
+        float height = region.getRegionHeight();
+        float invTexWidth = 1f / region.getTexture().getWidth();
+        float invTexHeight = 1f / region.getTexture().getHeight();
+        region.setRegion((x + fix) * invTexWidth, (y + fix) * invTexHeight, (x + width - fix) * invTexWidth, (y + height - fix) * invTexHeight); // Trims
+        // region
+    }
+
+
+
 
 
     @Override
