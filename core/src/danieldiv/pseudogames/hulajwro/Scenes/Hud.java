@@ -35,6 +35,11 @@ public class Hud implements Disposable {
     Label worldLabel;
     Label recordLabel;
     BitmapFont bitmapfont;
+    Label finishedLabel;
+    Label finishedLabelRecordTime;
+    boolean finished;
+    Table tableFinished;
+    Table tableNewRecord;
 
     public Hud(SpriteBatch sb, FahrenScreen screen, SpielFahre spiel) {
         // recordTime = 1000;
@@ -47,13 +52,22 @@ public class Hud implements Disposable {
         stage = new Stage(viewport, sb);
 
         // Gdx.input.setInputProcessor(stage);
-
+        //hud top Table
         Table table = new Table();
-
         //top position of stage
         table.top();
         //to make it the size of the stage
         table.setFillParent(true);
+
+        //middle finished Table
+        tableFinished = new Table();
+        tableFinished.center();
+        tableFinished.setFillParent(true);
+
+        //middle new best record
+        tableNewRecord = new Table();
+        tableNewRecord.center();
+        tableNewRecord.setFillParent(true);
 
         bitmapfont = new BitmapFont();
         bitmapfont.getData().setScale(2);
@@ -73,7 +87,10 @@ public class Hud implements Disposable {
             recordLabel = new Label("", new Label.LabelStyle(bitmapfont, Color.WHITE));
         else recordLabel = new Label("YOUR BEST:", new Label.LabelStyle(bitmapfont, Color.WHITE));
 
+        finishedLabel = new Label("Finished!", new Label.LabelStyle(bitmapfont, Color.WHITE));
+        finishedLabelRecordTime = new Label("NEW LIFE RECORD TIME", new Label.LabelStyle(bitmapfont, Color.WHITE));
 
+        //hud Table
         //expand for entire top row - for multimpe inside one row distribute them equally
         table.add(timeLabel).expandX().padTop(1);
         table.add(worldLabel).expandX().padTop(1);
@@ -87,10 +104,20 @@ public class Hud implements Disposable {
         // if (recordTime != 999)
         table.add(recordtimeLabel).expandX();
 
+
+        //finished Table
+        tableFinished.add(finishedLabel).expandX();
+
+        //new best Table
+        tableNewRecord.row();
+        tableNewRecord.add(finishedLabelRecordTime).expandX().padTop(100);
+
+        //setting record to high value for first game run after install
         if (recordTime == 999) {
             recordLabel.clear();
             recordtimeLabel.clear();
         }
+
 
         stage.addActor(table);
 
@@ -116,6 +143,8 @@ public class Hud implements Disposable {
             //nowtimeLabel.setText(  new DecimalFormat("#.##").format(runTimer));
             timeCount = 0;
         }
+
+
     }
 
 
@@ -142,11 +171,25 @@ public class Hud implements Disposable {
         //recordtimeLabel.setText((int) this.recordTime);
         if (recordTime != 0) {
             recordtimeLabel.setText(String.format("%.2f", (this.recordTime)).replace(",", ":"));
-            recordLabel.setText( "YOUR BEST:");
+            recordLabel.setText("YOUR BEST:");
         }
+
+    }
+
+    public void setNewRecordTime(float recordTime){
+        stage.addActor(tableNewRecord);
+
     }
 
     public float getRecordTime() {
         return recordTime;
+    }
+
+    public void setFinishedForHud(boolean finished) {
+        this.finished = finished;
+        if (finished) {
+            stage.addActor(tableFinished);
+        }
+
     }
 }

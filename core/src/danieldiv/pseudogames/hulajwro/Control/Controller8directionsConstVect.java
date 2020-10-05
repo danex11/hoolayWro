@@ -42,7 +42,7 @@ public class Controller8directionsConstVect {
         // Gdx.app.log("tag", "touchScreenPos=plrBodyScreenPos.y  " + touchScreenPos.y + "=" + plrBodyScreenPos.y);
 
         int widthCorrectiion = (int) (plrSprite.getWidth() / 2);
-        int plrPosXWithCorretion = (int) (plrSprite.getX());// + widthCorrectiion);
+        int plrPosXWithCorretion = (int) (plrSprite.getX() + widthCorrectiion);
         int straightMargin = (int) (1.3 * (plrSprite.getWidth()));// + 30;
         Gdx.app.log("tagGdx", "plrSprite.getX() " + plrSprite.getX() );
         Gdx.app.log("tagGdx", "plrSprite.getY() " + plrSprite.getY() );

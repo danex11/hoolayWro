@@ -35,12 +35,17 @@ import danieldiv.pseudogames.hulajwro.SpielFahre;
 import danieldiv.pseudogames.hulajwro.Scenes.Hud;
 import danieldiv.pseudogames.hulajwro.Tools.B2WorldBuilder;
 import danieldiv.pseudogames.hulajwro.Tools.FixBleedingTiles;
+import danieldiv.pseudogames.hulajwro.Tools.FixedList;
+import danieldiv.pseudogames.hulajwro.sprites.Follower;
 import danieldiv.pseudogames.hulajwro.sprites.PlrSprite;
 
 
-//TODO texture bleeding
+//TODO add follower sprite with slightly shifted time
+//TODO animation
+
+//TODO remove spring counterforce for touching close to sprite - this is how it comes to be:
+//app is catching touchPos > sprite is moving to this touchPos > touchPos is not changing, sprite oscillates around it with impulses
 //TODO deadzone to go straight up or down
-//todo marker @isFinished to stop controls handling, stop timer and display its finishing value
 
 public class FahrenScreen extends InputAdapter implements Screen {
 
@@ -72,11 +77,18 @@ public class FahrenScreen extends InputAdapter implements Screen {
     private float PPM = SpielFahre.PPM;
 
     private PlrSprite plr;
+    private Follower follower;
 
     private boolean goGoGo;
     float dragX, dragY;
     float touchX, touchY;
     Vector3 touchScreenPosGdx = new Vector3(0, 0, 0);
+
+    //tail
+    private FixedList<Vector2> inputPoints;
+    private Vector2 lastPoint = new Vector2();
+
+
     //https://github.com/libgdx/libgdx/wiki/Event-handling#inputmultiplexer
     InputAdapter inputHandling = new InputAdapter() {
         @Override
@@ -89,9 +101,19 @@ public class FahrenScreen extends InputAdapter implements Screen {
             touchY = Gdx.input.getY();
             //makes touchpos independant of screen density or resolution
             touchScreenPosGdx = new Vector3(touchX, touchY, 0);
-            Gdx.app.log("tagGdxT", "TTouchDown_ScreenPosGdx " + touchX + " " + touchY);
+            //  Gdx.app.log("tagGdxT", "TTouchDown_ScreenPosGdx " + touchX + " " + touchY);
             spielcam.unproject(touchScreenPosGdx);
-            Gdx.app.log("tagGdxT", "TTouchDown_WorldPos " + touchScreenPosGdx);
+            //  Gdx.app.log("tagGdxT", "TTouchDown_WorldPos " + touchScreenPosGdx);
+
+
+            //tail
+            //clear points
+            //inputPoints.clear();
+            //starting point
+            lastPoint = new Vector2(screenX, Gdx.graphics.getHeight() - screenY);
+            inputPoints.insert(lastPoint);
+
+
             return false;
         }
 
@@ -101,10 +123,25 @@ public class FahrenScreen extends InputAdapter implements Screen {
             dragX = Gdx.input.getX();
             dragY = Gdx.input.getY();
             touchScreenPosGdx = new Vector3(dragX, dragY, 0);
-            Gdx.app.log("tagGdxT", "touchDrag_ScreenPosGdx " + dragX + " " + dragY);
+            //  Gdx.app.log("tagGdxT", "touchDrag_ScreenPosGdx " + dragX + " " + dragY);
             spielcam.unproject(touchScreenPosGdx);
-            Gdx.app.log("tagGdxT", "touchDrag_ScreenPosGdx " + dragX + " " + dragY);
-            Gdx.app.log("tagGdxT", "touchDrag_WorldPos " + touchScreenPosGdx);
+            //  Gdx.app.log("tagGdxT", "touchDrag_ScreenPosGdx " + dragX + " " + dragY);
+            //  Gdx.app.log("tagGdxT", "touchDrag_WorldPos " + touchScreenPosGdx);
+
+            /*
+            //tail
+            Vector2 v = new Vector2(screenX, Gdx.graphics.getHeight() - screenY);
+
+            //calc length
+            float dx = v.x - lastPoint.x;
+            float dy = v.y - lastPoint.y;
+            float len = (float) Math.sqrt(dx * dx + dy * dy);
+
+            //add new point
+            inputPoints.insert(v);
+
+            lastPoint = v;
+             */
             return false;
         }
 
@@ -127,9 +164,16 @@ public class FahrenScreen extends InputAdapter implements Screen {
         return isResetPressed;
     }
 
+    int maxInputPoints = 100;
+
     public FahrenScreen(SpielFahre spiel) {
+
+        //tail
+        this.inputPoints = new FixedList<Vector2>(maxInputPoints, Vector2.class);
+
+
         this.spiel = spiel;
-        atlas = new TextureAtlas("hulajCharacters.pack");
+        atlas = new TextureAtlas("hulajCharacters2.atlas");
 
 
         spielcam = new OrthographicCamera();
@@ -175,8 +219,10 @@ public class FahrenScreen extends InputAdapter implements Screen {
         b2drenderer = new Box2DDebugRenderer();
 
         new B2WorldBuilder(world, map);
-        plr = new PlrSprite(world, this);
 
+        //SPRITES   SPRITES SPRITES
+        plr = new PlrSprite(world, this);
+        follower = new Follower(world, this);
 
         //**********
         //RESET Button  RESET Button    RESET Button    RESET Button    RESET Button
@@ -231,9 +277,6 @@ public class FahrenScreen extends InputAdapter implements Screen {
     }
 
 
-
-
-
     @Override
     public void show() {
     }
@@ -255,6 +298,8 @@ public class FahrenScreen extends InputAdapter implements Screen {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                //reset timer
+                finished = false;
                 //return super.touchDown(event, x, y, pointer, button);
                 Gdx.app.log("TagGdx", "reset up");
                 isResetPressed = true;
@@ -289,7 +334,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
         dirX = 0;
         dirY = 0;
         speed = 15;
-        damping = 7;
+        damping = 5;
         float damping_thresh = (float) 0.001;
         float damping_thresh_minus = -damping_thresh;
         float linVelX = plr.b2body.getLinearVelocity().x;
@@ -323,20 +368,29 @@ public class FahrenScreen extends InputAdapter implements Screen {
                 // plr.b2body.applyLinearImpulse(new Vector2(0, -moveVectY), plr.b2body.getWorldCenter(), true);
             } else moveVectY = moveVect.y;
             //zeroing y velocity
-            Vector2 pos = new Vector2(plr.b2body.getPosition());
+            // Vector2 pos = new Vector2(plr.b2body.getPosition());
             float posY = plr.b2body.getPosition().y;
             Gdx.app.log("tagGdx", "posY " + posY);
             //float dragYnew = dragY / PPM;
             Gdx.app.log("tagGdx", "touchScreenUnprojWorld.y " + (touchScreenPosGdx.y));
             //todo this should not be dependant of touching ofr not the screen
             //or maybe we want to allow the plr to make sprite float after  touchUp??
+            //zeroing y velocity cont.
             if (posY > (touchScreenPosGdx.y) - 0.2 && posY < (touchScreenPosGdx.y) + 0.2) {
                 Gdx.app.log("tagGdx", "inYzeroVelRange " + posY + " " + (touchScreenPosGdx.y));
                 plr.b2body.setLinearVelocity(plr.b2body.getLinearVelocity().x, 0);
                 moveVectY = 0;
             }
+
+            //zeroing x velocity for moving straight up
+            if (posY > (touchScreenPosGdx.y) - 0.2 && posY < (touchScreenPosGdx.y) + 0.2) {
+                Gdx.app.log("tagGdx", "inYzeroVelRange " + posY + " " + (touchScreenPosGdx.y));
+                plr.b2body.setLinearVelocity(plr.b2body.getLinearVelocity().x, 0);
+                moveVectY = 0;
+            }
+
             //applying impulses
-            //todo fix vector values - it takes them from 0,0 origin and is slower in some directions
+            // fix vector values - it takes them from 0,0 origin and is slower in some directions
             moveVectScaled = new Vector2(moveVectX / (PPM * 100), moveVectY / (PPM * 5));
             Gdx.app.log("tagGdx", "moveVectScaled " + moveVectScaled);
             plr.b2body.applyLinearImpulse(moveVectScaled, plr.b2body.getWorldCenter(), true);
@@ -354,6 +408,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
                 plr.b2body.applyLinearImpulse(new Vector2(0, damping / PPM), new Vector2(0, 0), true);
             }
 
+            //stop movement if speed is very low
             if ((linVelX < damping_thresh * 10) && (linVelX > -damping_thresh * 10))
                 plr.b2body.setLinearVelocity(new Vector2(0, 0));
             if ((linVelY < damping_thresh * 10) && (linVelY > -damping_thresh * 10))
@@ -363,35 +418,69 @@ public class FahrenScreen extends InputAdapter implements Screen {
     }
 
 
+    Vector2 followerPos = new Vector2(0, -2);
+boolean birdo = false;
+
     public void update(float deltatime) {
 
-        handleInput(deltatime);
+        Gdx.app.log("Tail", "inputPoints " + inputPoints);
+
+
+        if (!finished) handleInput(deltatime);
 
         world.step(1 / 60f, 6, 2);
 
         //player
         plr.updatee(deltatime);
+        Gdx.app.log("Plrpos", "Plrpos " + plr.getX() + " " + plr.getY());
+
+
+        //follower
+        //tail
+        if (plr.getX() > 40 && plr.getX() < 41 && plr.getY() > 8.5 && plr.getY() < 11) {
+            birdo = true;
+        }
+        if (birdo){
+            Vector2 v = new Vector2(plr.getX(), plr.getY());
+            //calc length
+            float dx = v.x - lastPoint.x;
+            float dy = v.y - lastPoint.y;
+            //add new point
+            inputPoints.insert(v);
+            lastPoint = v;
+            if (inputPoints.size > 3) {
+                followerPos = inputPoints.get(3);
+            }
+            follower.update(deltatime, (float) (followerPos.x - 0.8), (float) (followerPos.y + 0.5));
+        } else {
+            follower.update(deltatime, followerPos.x, followerPos.y);
+        }
 
         //cam tracking
         //also start position for plr on screen
         spielcam.position.x = plr.b2body.getPosition().x + spielViewPort.getWorldWidth() / 3;
 
         spielcam.update();
-        hud.update(deltatime);
+        if (!finished) hud.update(deltatime);
         isFinished(250);
+        if (finished) hud.setFinishedForHud(true);
     }
 
     float thisscore = 0;
+    boolean finished;
 
     public void isFinished(int finishpoint) {
         if (plr.getX() > finishpoint && plr.getX() < finishpoint + 1) {
+            finished = true;
             Gdx.app.log("APPlog", "plr.getX() " + plr.getX());
             thisscore = hud.getRunTimer();
             Gdx.app.log("APPlog", "thisscore " + thisscore);
             Gdx.app.log("APPlog", "hud.getRecordTime() " + hud.getRecordTime());
             Gdx.app.log("APPlog", "prefs.getFloat() " + (new Float(prefs.getFloat("highscore"))));
+            //set new highscore
             if (thisscore < prefs.getFloat("highscore") || (new Float(prefs.getFloat("highscore"))) == 0.0) {
                 hud.setRecordTime(thisscore);
+                hud.setNewRecordTime(thisscore);
                 //Prefs highscore save
                 prefs.putFloat("highscore", thisscore);
                 prefs.flush();
@@ -422,7 +511,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 
-        //todo for map texture bleeding
+        // for map texture bleeding
         //Set texture filtering of TiledMap
         mapRenderer.setView(spielcam);
         mapRenderer.render();
@@ -434,6 +523,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
         spiel.batch.setProjectionMatrix(spielcam.combined);
         spiel.batch.begin();
         plr.draw(spiel.batch);
+        follower.draw(spiel.batch);
         spiel.batch.end();
 
         //render overlays

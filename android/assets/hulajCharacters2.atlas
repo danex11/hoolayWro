@@ -9,11 +9,18 @@ sprite_frames_blue
   size: 228, 54
   orig: 228, 54
   offset: 0, 0
-  index: -1
+  index: 0
 jelen
   rotate: false
   xy: 231, 23
   size: 195, 32
   orig: 195, 32
   offset: 0, 0
-  index: -1
+  index: 1
+birdbrown
+  rotate: false
+  xy: 428, 20
+  size: 28, 35
+  orig: 28, 35
+  offset: 0, 0
+  index: 2

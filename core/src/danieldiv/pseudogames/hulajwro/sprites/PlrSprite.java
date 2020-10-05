@@ -1,5 +1,6 @@
 package danieldiv.pseudogames.hulajwro.sprites;
 
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -20,13 +21,30 @@ import static danieldiv.pseudogames.hulajwro.SpielFahre.PPM;
 public class PlrSprite extends Sprite {
     public World world;
     public Body b2body;
+
+    public enum State {STANDING, RUNNING}
+
+    ;
+    public State currentState;
+    public State previousState;
     private TextureRegion plrStandstill;
+    private Animation standing;
+    private Animation riding;
+    private float stateTimer;
+    private boolean runningRight;
+
     //private Rectangle rectFeet;
     private Rectangle rectFeet = new Rectangle();
 
     public PlrSprite(World world, FahrenScreen screen) {
         super(screen.getAtlas().findRegion("jelen"));
         this.world = world;
+
+        //
+        currentState = State.STANDING;
+        previousState = State.STANDING;
+        stateTimer = 0;
+
         definePlr();
         //get texture for stand pose
         plrStandstill = new TextureRegion(getTexture(), 230, 22, 39, 32);
@@ -66,8 +84,8 @@ public class PlrSprite extends Sprite {
     }
 
     public void updatee(float dt) {
-      //  rectFeet.setWidth((float) 0.7);
-       // rectFeet.setHeight((float) 0.1);
-        setPosition(b2body.getPosition().x - getWidth() / 2, b2body.getPosition().y - rectFeet.getHeight() );
+        //  rectFeet.setWidth((float) 0.7);
+        // rectFeet.setHeight((float) 0.1);
+        setPosition(b2body.getPosition().x - getWidth() / 2, b2body.getPosition().y - rectFeet.getHeight());
     }
 }

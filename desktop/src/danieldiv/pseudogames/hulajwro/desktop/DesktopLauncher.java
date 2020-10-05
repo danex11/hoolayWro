@@ -10,6 +10,8 @@ public class DesktopLauncher {
 		new LwjglApplication(new SpielFahre(), config);
 		config.height = 360;
 		config.width = 640;
+		//to do proper resize on fullscreen
+		//config.fullscreen = true;
 
 	}
 }
