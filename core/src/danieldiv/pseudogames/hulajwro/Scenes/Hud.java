@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+//import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+//import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -12,10 +14,9 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import java.text.DecimalFormat;
-
 import danieldiv.pseudogames.hulajwro.Screens.FahrenScreen;
 import danieldiv.pseudogames.hulajwro.SpielFahre;
+
 
 //New camera and new viewport to keep Hud locked at given position on the screen
 public class Hud implements Disposable {
@@ -35,6 +36,8 @@ public class Hud implements Disposable {
     Label worldLabel;
     Label recordLabel;
     BitmapFont bitmapfont;
+    BitmapFont ttfFont;
+    public static final String FONT_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;,{}\"´`'<>";
     Label finishedLabel;
     Label finishedLabelRecordTime;
     boolean finished;
@@ -71,6 +74,12 @@ public class Hud implements Disposable {
 
         bitmapfont = new BitmapFont();
         bitmapfont.getData().setScale(2);
+/*
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("data/unbom.ttf"));
+        FreeTypeFontParameter parameter = new FreeTypeFontParameter();
+        parameter.size = 18;
+        ttfFont = TrueTypeFontFactory.createBitmapFont(Gdx.files.internal("font.ttf"), FONT_CHARACTERS, 12.5f, 7.5f, 1.0f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        */
         //%03d - 3 digits long
         //%06d - 6 digits long
         // countdownLabel = new Label(String.format("%03d", worldTimer), new Label.LabelStyle(new BitmapFont(), Color.WHITE));

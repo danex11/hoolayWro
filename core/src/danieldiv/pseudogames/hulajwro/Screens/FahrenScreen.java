@@ -110,6 +110,8 @@ public class FahrenScreen extends InputAdapter implements Screen {
             //clear points
             //inputPoints.clear();
             //starting point
+
+            //todo?
             lastPoint = new Vector2(screenX, Gdx.graphics.getHeight() - screenY);
             inputPoints.insert(lastPoint);
 
@@ -173,7 +175,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
 
 
         this.spiel = spiel;
-        atlas = new TextureAtlas("hulajCharacters2.atlas");
+        atlas = new TextureAtlas("hulajCharacters.atlas");
 
 
         spielcam = new OrthographicCamera();
@@ -197,7 +199,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
 
 
         mapLoader = new TmxMapLoader();
-        map = mapLoader.load("tilemaps/csvprawydol.tmx");
+        map = mapLoader.load("tilemaps/1500ofsize16.tmx");
 
         //map texture bleeding fix
         FixBleedingTiles fixedmap = new FixBleedingTiles(map);
@@ -205,12 +207,12 @@ public class FahrenScreen extends InputAdapter implements Screen {
 
         //this centers around zero,zero
         //mapRenderer = new OrthogonalTiledMapRenderer(map, 1 / PPM);
-        mapRenderer = new OrthogonalTiledMapRenderer(mapFixed, 1 / PPM);
+        mapRenderer = new OrthogonalTiledMapRenderer(mapFixed, 4 / PPM);
         // Reading map layers
         mapLayers = map.getLayers();
 
         //map overlay layer
-        overlayLayer = (TiledMapTileLayer) mapLayers.get("overlay");
+        overlayLayer = (TiledMapTileLayer) mapLayers.get("overlays");
 
         // mapRenderer.setView(spielViewPort);
         //move zerozero to left down corner
@@ -288,9 +290,9 @@ public class FahrenScreen extends InputAdapter implements Screen {
 
     public void handleInput(float deltatime) {
         //zoom
-        if (Gdx.input.isKeyPressed(Input.Keys.Z) && spielcam.zoom > 0)
+        if (Gdx.input.isKeyPressed(Input.Keys.X) && spielcam.zoom > 0)
             spielcam.zoom -= 0.01f;
-        if (Gdx.input.isKeyPressed(Input.Keys.X))
+        if (Gdx.input.isKeyPressed(Input.Keys.Z))
             spielcam.zoom += 0.01f;
 
         //RESET *****
@@ -418,8 +420,8 @@ public class FahrenScreen extends InputAdapter implements Screen {
     }
 
 
+    boolean birdo = false;
     Vector2 followerPos = new Vector2(0, -2);
-boolean birdo = false;
 
     public void update(float deltatime) {
 
@@ -437,6 +439,7 @@ boolean birdo = false;
 
         //follower
         //tail
+        //tree region
         if (plr.getX() > 40 && plr.getX() < 41 && plr.getY() > 8.5 && plr.getY() < 11) {
             birdo = true;
         }
@@ -452,19 +455,21 @@ boolean birdo = false;
                 followerPos = inputPoints.get(3);
             }
             follower.update(deltatime, (float) (followerPos.x - 0.8), (float) (followerPos.y + 0.5));
-        } else {
-            follower.update(deltatime, followerPos.x, followerPos.y);
         }
+     else    {
+        follower.update(deltatime, followerPos.x, followerPos.y);
+    }
 
-        //cam tracking
-        //also start position for plr on screen
-        spielcam.position.x = plr.b2body.getPosition().x + spielViewPort.getWorldWidth() / 3;
+    //cam tracking
+    //also start position for plr on screen
+    spielcam.position.x =plr.b2body.getPosition().x +spielViewPort.getWorldWidth()/5;
 
         spielcam.update();
-        if (!finished) hud.update(deltatime);
-        isFinished(250);
-        if (finished) hud.setFinishedForHud(true);
-    }
+        if(!finished)hud.update(deltatime);
+
+    isFinished(250);
+        if(finished)hud.setFinishedForHud(true);
+}
 
     float thisscore = 0;
     boolean finished;
@@ -488,7 +493,8 @@ boolean birdo = false;
         }
     }
 
-    public enum State {Running, Paused}
+public enum State {
+    Running, Paused}
 
     //set to run
     State state = State.Running;

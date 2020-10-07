@@ -1,0 +1,20 @@
+
+hulajCharacters.png
+size: 256,64
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+bird2blue
+  rotate: false
+  xy: 2, 2
+  size: 63, 25
+  orig: 63, 25
+  offset: 0, 0
+  index: 1
+jelen
+  rotate: false
+  xy: 2, 29
+  size: 195, 32
+  orig: 195, 32
+  offset: 0, 0
+  index: 0

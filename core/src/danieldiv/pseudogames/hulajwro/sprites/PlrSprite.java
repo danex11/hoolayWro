@@ -9,10 +9,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
-
-import java.awt.SplashScreen;
+import com.badlogic.gdx.utils.Array;
 
 import danieldiv.pseudogames.hulajwro.Screens.FahrenScreen;
 
@@ -22,14 +20,14 @@ public class PlrSprite extends Sprite {
     public World world;
     public Body b2body;
 
+    //for Animation
     public enum State {STANDING, RUNNING}
 
-    ;
     public State currentState;
     public State previousState;
     private TextureRegion plrStandstill;
-    private Animation standing;
-    private Animation riding;
+    // private Animation plrStand;
+    private Animation plrRun;
     private float stateTimer;
     private boolean runningRight;
 
@@ -44,14 +42,67 @@ public class PlrSprite extends Sprite {
         currentState = State.STANDING;
         previousState = State.STANDING;
         stateTimer = 0;
+        runningRight = true;
+        Array<TextureRegion> frames = new Array<TextureRegion>();
 
+        //in pixels region data
+        String regionName = "jelen";
+        int framesNo = 5;
+        int widthOfFrame = getRegionWidth() / framesNo;
+        int heightOfFrame = getRegionHeight();
+
+        for (int i = 0; i < 5; i++)
+            frames.add(new TextureRegion(screen.getAtlas().findRegion(regionName), i * widthOfFrame, 0, widthOfFrame, heightOfFrame));
+
+        plrRun = new Animation(0.1f, frames);
+        frames.clear();
+
+        //get texture for stand pose - it should be done by "jelen" txture name
+        plrStandstill = new TextureRegion(screen.getAtlas().findRegion(regionName), 0, 0, widthOfFrame, heightOfFrame);
         definePlr();
-        //get texture for stand pose
-        plrStandstill = new TextureRegion(getTexture(), 230, 22, 39, 32);
+
         //size of sprite on the screen
         setBounds(0, 0, 80 / PPM, 80 / PPM);
         setRegion(plrStandstill);
     }
+
+
+    public TextureRegion getFrame(float dt) {
+        currentState = getState();
+        TextureRegion region;
+        switch (currentState) {
+            case RUNNING:
+                region = (TextureRegion) plrRun.getKeyFrame(stateTimer, true);
+                break;
+            case STANDING:
+                // break;
+            default:
+                region = plrStandstill;
+                break;
+        }
+        //flip left or right for standing still
+        if ((b2body.getLinearVelocity().x < 0 || !runningRight) && !region.isFlipX()) {
+            region.flip(true, false);
+            runningRight = false;
+        } else if ((b2body.getLinearVelocity().x > 0 || runningRight) && region.isFlipX()) {
+            region.flip(true, false);
+            runningRight = true;
+        }
+
+        //TODO study this
+        stateTimer = currentState == previousState ? stateTimer + dt : 0;
+        previousState = currentState;
+        return region;
+    }
+
+
+    public State getState() {
+        if ((b2body.getLinearVelocity().x > 10 || b2body.getLinearVelocity().x < -10) || b2body.getLinearVelocity().y > 10)
+            return State.RUNNING;
+        else
+            return State.STANDING;
+    }
+
 
     public void definePlr() {
         //def body
@@ -87,5 +138,6 @@ public class PlrSprite extends Sprite {
         //  rectFeet.setWidth((float) 0.7);
         // rectFeet.setHeight((float) 0.1);
         setPosition(b2body.getPosition().x - getWidth() / 2, b2body.getPosition().y - rectFeet.getHeight());
+        setRegion(getFrame(dt));
     }
 }

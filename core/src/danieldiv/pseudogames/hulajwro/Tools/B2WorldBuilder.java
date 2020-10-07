@@ -12,8 +12,6 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import danieldiv.pseudogames.hulajwro.SpielFahre;
-import danieldiv.pseudogames.hulajwro.sprites.Coin;
-import danieldiv.pseudogames.hulajwro.sprites.InteractiveTiledObject;
 import danieldiv.pseudogames.hulajwro.sprites.Solids;
 
 import static danieldiv.pseudogames.hulajwro.SpielFahre.PPM;
@@ -27,7 +25,7 @@ public class B2WorldBuilder {
         Body body;
 
         //TileObjectLayer 1-solids
-        for (MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)) {
+        for (MapObject object : map.getLayers().get(3).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
             //we are giving it our world, map and object rectangle
             //it will pass it to:  Solids>InteractiveTiledObject> there define and set in the world a body for b2d
