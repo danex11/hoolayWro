@@ -35,7 +35,13 @@ public class PlrSprite extends Sprite {
     private Rectangle rectFeet = new Rectangle();
 
     public PlrSprite(World world, FahrenScreen screen) {
-        super(screen.getAtlas().findRegion("jelen"));
+        super(screen.getAtlas().findRegion("girlbluegreen"));
+        //in pixels region data
+        String regionName = "girlbluegreen";
+        int framesNo = 4;
+        int widthOfFrame = getRegionWidth() / framesNo;
+        int heightOfFrame = getRegionHeight();
+        int spriteScaling = 2;
         this.world = world;
 
         //
@@ -45,24 +51,19 @@ public class PlrSprite extends Sprite {
         runningRight = true;
         Array<TextureRegion> frames = new Array<TextureRegion>();
 
-        //in pixels region data
-        String regionName = "jelen";
-        int framesNo = 5;
-        int widthOfFrame = getRegionWidth() / framesNo;
-        int heightOfFrame = getRegionHeight();
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < framesNo; i++)
             frames.add(new TextureRegion(screen.getAtlas().findRegion(regionName), i * widthOfFrame, 0, widthOfFrame, heightOfFrame));
 
         plrRun = new Animation(0.1f, frames);
         frames.clear();
 
-        //get texture for stand pose - it should be done by "jelen" txture name
+        //get texture for stand pose - it should be done by  txture region name
         plrStandstill = new TextureRegion(screen.getAtlas().findRegion(regionName), 0, 0, widthOfFrame, heightOfFrame);
         definePlr();
 
         //size of sprite on the screen
-        setBounds(0, 0, 80 / PPM, 80 / PPM);
+        setBounds(0, 0, spriteScaling*widthOfFrame / PPM, spriteScaling*heightOfFrame / PPM);
         setRegion(plrStandstill);
     }
 
@@ -81,10 +82,10 @@ public class PlrSprite extends Sprite {
                 break;
         }
         //flip left or right for standing still
-        if ((b2body.getLinearVelocity().x < 0 || !runningRight) && !region.isFlipX()) {
+        if ((b2body.getLinearVelocity().x < -1 || !runningRight) && !region.isFlipX()) {
             region.flip(true, false);
             runningRight = false;
-        } else if ((b2body.getLinearVelocity().x > 0 || runningRight) && region.isFlipX()) {
+        } else if ((b2body.getLinearVelocity().x > 1 || runningRight) && region.isFlipX()) {
             region.flip(true, false);
             runningRight = true;
         }
@@ -107,7 +108,8 @@ public class PlrSprite extends Sprite {
     public void definePlr() {
         //def body
         BodyDef bodydef = new BodyDef();
-        bodydef.position.set(32 / PPM, 128 / PPM);
+        //Starting plr position
+        bodydef.position.set(320 / PPM, 128 / PPM);
         bodydef.type = BodyDef.BodyType.DynamicBody;
         bodydef.fixedRotation = true;
         //BODY in kgm   BODY in kgm BODY in kgm BODY in kgm
@@ -118,7 +120,7 @@ public class PlrSprite extends Sprite {
         //fixture def
         FixtureDef fdef = new FixtureDef();
         //circle shape?
-        fdef.restitution = 0.6f;
+        fdef.restitution = 0.9f;
         fdef.density = 0.4f;
         CircleShape circle = new CircleShape();
         circle.setRadius((float) 0.7);

@@ -59,19 +59,22 @@ public class Controller8directionsConstVect {
             touchzoneForceVector.y = -((h - forceValueY));
             touchzoneForceVector.y = -forceValueY;
             if ((touchScreenPosGdx.x < plrPosXWithCorretion)) {
-                touchzoneForceVector.x = -forceValueX;
+             //   touchzoneForceVector.x = -forceValueX;
+                touchzoneForceVector.x = forceValueX;
             } else if ((touchScreenPosGdx.x > plrPosXWithCorretion+ (straightMargin))) {
                 touchzoneForceVector.x = forceValueX;
             } else if (touchScreenPosGdx.x >= plrPosXWithCorretion
                     && touchScreenPosGdx.x <= plrPosXWithCorretion + (straightMargin)) {
                 touchzoneForceVector.x = 0;
+
             }
             // CCC  ---  up Y
         } else if (touchScreenPosGdx.y > plrSpriteWorldPos.y + (straightMargin)) {
             /////////////////////////Gdx.app.log("tag", "up Y  ");
             touchzoneForceVector.y = (forceValueY);
             if ((touchScreenPosGdx.x < plrPosXWithCorretion)) {
-                touchzoneForceVector.x = -forceValueX;
+               // touchzoneForceVector.x = -forceValueX;
+                touchzoneForceVector.x = forceValueX;
             } else if ((touchScreenPosGdx.x > plrPosXWithCorretion+ (straightMargin))) {
                 touchzoneForceVector.x = forceValueX;
             } else if (touchScreenPosGdx.x >= plrPosXWithCorretion
@@ -85,7 +88,8 @@ public class Controller8directionsConstVect {
                 //Gdx.app.log("tag", "constant Y  ");
                 touchzoneForceVector.y = (0);
                 if ((touchScreenPosGdx.x < plrPosXWithCorretion)) {
-                    touchzoneForceVector.x = -forceValueX;
+                   // touchzoneForceVector.x = -forceValueX;
+                    touchzoneForceVector.x = forceValueX;
                 } else if ((touchScreenPosGdx.x > plrPosXWithCorretion+ (straightMargin))) {
                     touchzoneForceVector.x = forceValueX;
                 } else if (touchScreenPosGdx.x >= plrPosXWithCorretion

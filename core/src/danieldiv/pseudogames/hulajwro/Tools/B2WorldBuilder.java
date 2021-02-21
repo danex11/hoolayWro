@@ -27,6 +27,11 @@ public class B2WorldBuilder {
         //TileObjectLayer 1-solids
         for (MapObject object : map.getLayers().get(3).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
+            //SCALING of box2d objectlayer
+             rect.setWidth(rect.getWidth()*4);
+            rect.setHeight(rect.getHeight()*4);
+            rect.x = rect.x*4;
+            rect.y = rect.y*4;
             //we are giving it our world, map and object rectangle
             //it will pass it to:  Solids>InteractiveTiledObject> there define and set in the world a body for b2d
             new Solids(world, map, rect);
