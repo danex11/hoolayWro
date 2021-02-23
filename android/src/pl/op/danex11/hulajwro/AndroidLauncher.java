@@ -7,7 +7,7 @@ import android.view.View;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
-import danieldiv.pseudogames.hulajwro.SpielFahre;
+//import pl.op.danex11.hulajwro.SpielFahre;
 
 public class AndroidLauncher extends AndroidApplication {
     @Override

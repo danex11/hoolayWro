@@ -4,8 +4,8 @@ gwt {
     minHeapSize="1G"
 
     src = files(file("src/")) // Needs to be in front of "modules" below.
-    modules 'danieldiv.pseudogames.hulajwro.GdxDefinition'
-    devModules 'danieldiv.pseudogames.hulajwro.GdxDefinitionSuperdev'
+    modules 'pl.op.danex11.hulajwro.GdxDefinition'
+    devModules 'pl.op.danex11.hulajwro.GdxDefinitionSuperdev'
     project.webAppDirName = 'webapp'
 
     compiler {
