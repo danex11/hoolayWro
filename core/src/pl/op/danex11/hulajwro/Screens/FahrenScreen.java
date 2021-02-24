@@ -57,7 +57,7 @@ import pl.op.danex11.hulajwro.sprites.PlrSprite;
  *
  * @author Daniel Szablewski
  * @version 0.3
- * @since   2020-10-
+ * @since 2020-10-
  */
 public class FahrenScreen extends InputAdapter implements Screen {
 
@@ -193,7 +193,6 @@ public class FahrenScreen extends InputAdapter implements Screen {
     int maxInputPoints = 100;
 
     /**
-     *
      * @param spiel
      */
     public FahrenScreen(SpielFahre spiel) {
@@ -316,6 +315,26 @@ public class FahrenScreen extends InputAdapter implements Screen {
     int speed, damping;
 
 
+
+    public void handleInputAfterFinish(float deltatime) {
+        resetButton.addListener(new ClickListener() {
+            // Gdx.app.log("TagGdx", "reset up");
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Gdx.app.log("TagGdx", "reset Down afterfinish");
+                super.touchDown(event, x, y, pointer, button);
+                //reset timer
+                finished = false;
+                // isResetPressed = true;
+                //Prefs - highscore load
+                hud.setRecordTime(prefs.getFloat("highscore"));
+                isResetPressed = true;
+                return true;
+            }
+        });
+    }
+
     public void handleInput(float deltatime) {
         //zoom
         if (Gdx.input.isKeyPressed(Input.Keys.X) && spielcam.zoom > 0)
@@ -323,13 +342,14 @@ public class FahrenScreen extends InputAdapter implements Screen {
         if (Gdx.input.isKeyPressed(Input.Keys.Z))
             spielcam.zoom += 0.01f;
 
+
         //RESET *****
         resetButton.addListener(new ClickListener() {
-                           // Gdx.app.log("TagGdx", "reset up");
-
+            // Gdx.app.log("TagGdx", "reset up");
+/*
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                super.touchUp(event, x, y, pointer, button);
+                ////////////////super.touchUp(event, x, y, pointer, button);
                 //reset timer
                 finished = false;
                 //return super.touchDown(event, x, y, pointer, button);
@@ -337,8 +357,11 @@ public class FahrenScreen extends InputAdapter implements Screen {
                // isResetPressed = true;
                 //Prefs - highscore load
                 hud.setRecordTime(prefs.getFloat("highscore"));
-                //return true;
+                //////return true;
+                isResetPressed = true;
             }
+
+         */
 /*
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
@@ -424,7 +447,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
             } else moveVectY = moveVect.y;
             //zeroing y velocity
             // Vector2 pos = new Vector2(plr.b2body.getPosition());
-             //posY = plr.b2body.getPosition().y;
+            //posY = plr.b2body.getPosition().y;
             Gdx.app.log("tagGdx", "posY " + posY);
             //float dragYnew = dragY / PPM;
             Gdx.app.log("tagGdx", "touchScreenUnprojWorld.y " + (touchScreenPosGdx.y));
@@ -496,16 +519,19 @@ public class FahrenScreen extends InputAdapter implements Screen {
 
         //tail Array
         //Gdx.app.log("Tail", "inputPoints " + inputPoints);
+        Gdx.app.log("TagGdxfinished ", ""+finished);
+
 
 
         if (!finished) handleInput(deltatime);
+        if (finished) handleInputAfterFinish(deltatime);
 
         world.step(1 / 60f, 6, 2);
 
         //player
         plr.updatee(deltatime);
-        Gdx.app.log("Plrpos", "Plrpos " + plr.getX() + " " + plr.getY());
-        Gdx.app.log("MathSin", "MathSin " + 10 * MathUtils.sinDeg(isin));
+        //////////Gdx.app.log("Plrpos", "Plrpos " + plr.getX() + " " + plr.getY());
+        ///////////Gdx.app.log("MathSin", "MathSin " + 10 * MathUtils.sinDeg(isin));
 
         //follower
         //tail
