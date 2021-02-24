@@ -5,8 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-//import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-//import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -16,6 +15,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import pl.op.danex11.hulajwro.Screens.FahrenScreen;
 import pl.op.danex11.hulajwro.SpielFahre;
+
+//import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+//import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 
 
 //New camera and new viewport to keep Hud locked at given position on the screen
@@ -80,24 +82,30 @@ public class Hud implements Disposable {
         parameter.size = 18;
         ttfFont = TrueTypeFontFactory.createBitmapFont(Gdx.files.internal("font.ttf"), FONT_CHARACTERS, 12.5f, 7.5f, 1.0f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         */
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("ka1.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 30; // font size
+        Color fontColor = Color.BLACK;
+        BitmapFont font12 = generator.generateFont(parameter);
+        generator.dispose(); // avoid memory leaks, important
         //%03d - 3 digits long
         //%06d - 6 digits long
-        // countdownLabel = new Label(String.format("%03d", worldTimer), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        nowtimeLabel = new Label(StringOfTimeNow, new Label.LabelStyle(bitmapfont, Color.WHITE));
+        // countdownLabel = new Label(String.format("%03d", worldTimer), new Label.LabelStyle(new BitmapFont(), fontColor));
+        nowtimeLabel = new Label(StringOfTimeNow, new Label.LabelStyle(font12, fontColor));
         Gdx.app.log("APPlog", "RecordTimeLabel " + this.recordTime);
         if (recordTime == 999)
-            recordtimeLabel = new Label("", new Label.LabelStyle(bitmapfont, Color.WHITE));
+            recordtimeLabel = new Label("", new Label.LabelStyle(font12, fontColor));
         else
-            recordtimeLabel = new Label(String.format("%.2f", this.recordTime), new Label.LabelStyle(bitmapfont, Color.WHITE));
-        timeLabel = new Label("TIME:", new Label.LabelStyle(bitmapfont, Color.WHITE));
-        levelLabel = new Label("level1", new Label.LabelStyle(bitmapfont, Color.WHITE));
-        worldLabel = new Label("World 1", new Label.LabelStyle(bitmapfont, Color.WHITE));
+            recordtimeLabel = new Label(String.format("%.2f", this.recordTime), new Label.LabelStyle(font12, fontColor));
+        timeLabel = new Label("TIME:", new Label.LabelStyle(font12, fontColor));
+        levelLabel = new Label("level1", new Label.LabelStyle(font12, fontColor));
+        worldLabel = new Label("World 1", new Label.LabelStyle(font12, fontColor));
         if (recordTime == 999)
-            recordLabel = new Label("", new Label.LabelStyle(bitmapfont, Color.WHITE));
-        else recordLabel = new Label("YOUR BEST:", new Label.LabelStyle(bitmapfont, Color.WHITE));
+            recordLabel = new Label("", new Label.LabelStyle(font12, fontColor));
+        else recordLabel = new Label("YOUR BEST:", new Label.LabelStyle(font12, fontColor));
 
-        finishedLabel = new Label("Finished!", new Label.LabelStyle(bitmapfont, Color.WHITE));
-        finishedLabelRecordTime = new Label("NEW LIFE RECORD TIME", new Label.LabelStyle(bitmapfont, Color.WHITE));
+        finishedLabel = new Label("Finished!", new Label.LabelStyle(font12, fontColor));
+        finishedLabelRecordTime = new Label("NEW LIFE RECORD TIME", new Label.LabelStyle(font12, fontColor));
 
         //hud Table
         //expand for entire top row - for multimpe inside one row distribute them equally
