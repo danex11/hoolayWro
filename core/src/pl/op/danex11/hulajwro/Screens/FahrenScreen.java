@@ -6,6 +6,8 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -191,11 +193,20 @@ public class FahrenScreen extends InputAdapter implements Screen {
     }
 
     int maxInputPoints = 100;
+    Music music_background;//= Gdx.audio.newMusic(Gdx.files.internal("S31-CityonSpeed.ogg"));;
 
     /**
      * @param spiel
      */
     public FahrenScreen(SpielFahre spiel) {
+
+        //music
+        //Sound music_background = Gdx.audio.newMusic(Gdx.files.internal("background_music.mp3"));
+        music_background = Gdx.audio.newMusic(Gdx.files.internal("S31-CityonSpeed.ogg"));
+        music_background.setLooping(true);
+        music_background.setVolume(0.6f);
+        music_background.play();
+        //music_background.dispose();
 
         //tail
         this.inputPoints = new FixedList<Vector2>(maxInputPoints, Vector2.class);
@@ -315,7 +326,6 @@ public class FahrenScreen extends InputAdapter implements Screen {
     int speed, damping;
 
 
-
     public void handleInputAfterFinish(float deltatime) {
         resetButton.addListener(new ClickListener() {
             // Gdx.app.log("TagGdx", "reset up");
@@ -390,6 +400,8 @@ public class FahrenScreen extends InputAdapter implements Screen {
         });
         if (isResetPressed()) {
             Gdx.app.log("TagGdx", "reset SpFh");
+            music_background.stop();
+            music_background.dispose();
             spiel.setScreen(new FahrenScreen((SpielFahre) spiel));
 
 
@@ -519,8 +531,7 @@ public class FahrenScreen extends InputAdapter implements Screen {
 
         //tail Array
         //Gdx.app.log("Tail", "inputPoints " + inputPoints);
-        Gdx.app.log("TagGdxfinished ", ""+finished);
-
+        Gdx.app.log("TagGdxfinished ", "" + finished);
 
 
         if (!finished) handleInput(deltatime);
