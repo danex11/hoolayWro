@@ -18,10 +18,10 @@ android {
     }
     defaultConfig {
         applicationId "op.danex11.hulajwro"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 29
-        versionCode 7
-        versionName "2.0.5"
+        versionCode 8
+        versionName "2.1.5"
         ndk{
             abiFilters "armeabi", "armeabi-v7a", "x86", "mips", 'x86_64', 'arm64-v8a'
         }
@@ -34,6 +34,7 @@ android {
     }
 
     dependencies {
+        implementation 'com.google.android.gms:play-services-ads:20.4.0'
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"

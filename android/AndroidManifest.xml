@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="pl.op.danex11.hulajwro" >
+    package="pl.op.danex11.hulajwro">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:allowBackup="true"
+        android:appCategory="game"
         android:icon="@mipmap/ic_launcher"
         android:isGame="true"
-        android:appCategory="game"
         android:label="@string/app_name"
-        android:theme="@style/GdxTheme" >
+        android:theme="@style/GdxTheme">
+        <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713, for HulajWro: ca-app-pub-9180007219356993~2489900228-->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-9180007219356993~2489900228" />
         <activity
             android:name="pl.op.danex11.hulajwro.AndroidLauncher"
-            android:label="@string/app_name" 
-            android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout">
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
