@@ -7,4 +7,6 @@ sourceSets.main.java.srcDirs = ["src/"]
 
 eclipse.project.name = appName + "-core"
 
-dependencies { implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion" }
+dependencies { implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    //AdMob
+    implementation 'com.google.android.gms:play-services-ads:20.4.0'}

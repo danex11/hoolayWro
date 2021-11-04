@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pl.op.danex11.hulajwro">
+    <!-- AdMob -->>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
-    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:allowBackup="true"
         android:appCategory="game"
         android:icon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
         android:isGame="true"
         android:label="@string/app_name"
         android:theme="@style/GdxTheme">
         <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713, for HulajWro: ca-app-pub-9180007219356993~2489900228-->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-9180007219356993~2489900228" />
+            android:value="ca-app-pub-3940256099942544~3347511713" />
         <activity
             android:name="pl.op.danex11.hulajwro.AndroidLauncher"
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout"
